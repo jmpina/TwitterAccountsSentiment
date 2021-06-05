@@ -1,0 +1,33 @@
+import tweepy 
+import csv
+consumer_key= '…'
+consumer_secret= '…'
+access_token= '…'
+access_token_secret= '…'
+auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+auth.set_access_token(access_token, access_token_secret)
+api = tweepy.API(auth)
+f = open('listacuentas.txt', 'r')
+users = f.read().splitlines()
+f.close()
+for user_name in users:
+   all_tweets=[]
+   tweets=api. user_timeline(screen_name = user_name, count=200, include_rts = False, tweet_mode = 'extended')
+   all_tweets.extend(tweets) 
+   oldest = all_tweets[-1].id – 1
+   while len(tweets) > 0:
+      print ("getting tweets before %s" % (oldest))
+      tweets = api.user_timeline(screen_name = user_name, count=200, include_rts = False, max_id=oldest, tweet_mode = 'extended')
+      all_tweets.extend(tweets)
+      oldest = all_tweets[-1].id – 1
+   from pandas import DataFrame
+   outtweets = [[tweet.id_str, tweet.user.name, tweet.user.screen_name, tweet.user.description, tweet.user.location, tweet.user.followers_count, tweet.user.friends_count,tweet.user.favourites_count,tweet.user.statuses_count,tweet.user.listed_count, tweet.user.default_profile,tweet.user.default_profile_image,tweet.created_at, tweet.favorite_count, tweet.retweet_count, tweet.full_text.encode("utf-8").decode("utf-8")]
+   for idx,tweet in enumerate(all_tweets)] 
+   df =DataFrame(outtweets,columns=["id","name","sreen_name","description","location","followers_count","friends_count","favourites_count","statuses_count", "listed_count","default_profile","default_profile_image","created_at","favorite_count","retweet_count", "text"])
+   nombre=”tuits” + user_name
+   filename= "%s.csv" % nombre
+   df.to_csv(filename,index=False)
+   df.head(3)
+.......................
+
+#listacuentas is a TXT file that includes the Twitter accounts to be explored
